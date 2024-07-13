@@ -1,32 +1,15 @@
-<h1 align="center">Hi 👋, I'm Ibrahim Nowshad </h1>
-<h3 align="center"> Site Reliability and Platform Engineer </h3>
+I started out building robust infrastructure, brick by brick. Then, the clouds rolled in, and I traded hammers for orchestration tools. Now, I'm not just an infrastructure pro, I'm a cloud whisperer, crafting secure, scalable solutions that dance in the sky.
 
-<p align="center"> <img src="https://komarev.com/ghpvc/?username=ibnunowshad&label=Profile%20views&color=0e75b6&style=flat" alt="ibnunowshad" />
-		   <img src="https://img.shields.io/github/followers/ibnunowshad?label=Followers" alt="ibnunowshad" />
-</p>
-<br>
-<img align="right" src="https://user-images.githubusercontent.com/63050133/156676671-d5b2e362-97d4-4404-9447-dd71ddfea82f.gif" width = 250px/>
+No two projects are identical, like no two mountain trails are the same. I've trekked through complex migrations, scaled peaks of automation, and rappelled down security cliffs. Every challenge is a chance to learn, and my backpack overflows with expertise in design, migration, and more.
 
-- :school: I am a Professional Engineering graduate with `Information Technology` major. 
-- 🔭 I’m currently working on my `personal and freelancing` projects
-- 🌱 I’m currently preparing for `CNCF CKA` and `Google Cloud Professional Architect`
-- 📫 How to reach me `mi[at]ibn.slmail.me`
-- :thinking: I’m currently open for: `Site Reliability Engineer` or `Platform Engineer`, this is my [digital-cv](https://cv.ibnunowshad.com).
-- :nerd_face: Always `learning new things`
-- 🐼 Doing my best 
+But work isn't my only Everest. When I'm not wrangling servers, I'm out on the open road, exploring new cultures and landscapes. Each journey fuels my passion for knowledge, and I bring that fresh perspective back to every project, keeping my skills as sharp as my trekking poles.
 
-<br>
+As with many situations, there will be no one right answer and typically, different people come up with different solutions. Architecting systems is a matter of weighing the pros and cons of various solutions and trying to find the best solution given requirements and constraints. 
 
-## 📊 Github Stats
-<p align="center"><img src="https://github-readme-streak-stats.herokuapp.com/?user=ibnunowshad&theme=tokyonight_duo" alt="ibnunowshad" /></p>
-  <br/>
-  <p align="center">
-    <a href="https://github.com/anuraghazra/github-readme-stats">
-	<img alt="ibnunowshad's Github Stats" src="https://github-readme-stats.vercel.app/api?username=ibnunowshad&show_icons=true&count_private=true&locale=en&theme=tokyonight&layout=compact" height="230px"/></a>
-	<img src="https://github-readme-stats.vercel.app/api/top-langs?username=ibnunowshad&langs_count=10&show_icons=true&locale=en&theme=tokyonight" alt="ibnunowshad" height="230px"/> <br/>
+Also, I'm a frugal, and I know how to write requirements. SaaS isn't the answer for everything.
 
-  **Note:** Top languages is only a metric of the languages my public code consists of and doesn't reflect experience or skill level.
-  </p>
+I don't need the mid-sized Jeep, AWS, GCP, or Linode just yet for my usage. But, the VW Polo is okay for now. When required, I know how to lift and shift, migrate.
 
+Also, it's fun to learn something new, like split-horizon DNS, super-subnetting, or even just good old serial to times before password management was even a twinkle in someone's eye.
 
-
+So, if you're ready to ditch the status quo and build a cloud kingdom beyond the horizon, let's climb together. Drop me a line on [Keybase](https://keybase.com/ibnunowshad) or [Telegram](https://ibnunowshad.t.me), or email me at [github[at]ibn.slmail[dot]me](mailto:github@ibn.slmail.me). My [calendar](https://cal.com/ibnunowshad) is open to block my time at your convinience, let's chat!
