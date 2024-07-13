@@ -14,4 +14,4 @@ Also, it's fun to learn something new, like split-horizon DNS, super-subnetting,
 
 So, if you're ready to ditch the status quo and build a cloud kingdom beyond the horizon, let's climb together. Drop me a line on [Keybase](https://keybase.com/ibnunowshad) or [Telegram](https://ibnunowshad.t.me), or email me at [github[at]ibn.slmail[dot]me](mailto:github@ibn.slmail.me) _(clicking on it will take you to your default email client or copy paste, ensure to replace **[at]** and **[dot]** with **@** and **.** respectively)_.
 
-My [calendar](https://cal.com/ibnunowshad) is open to block my time at your convinience, let's chat!
+If you need a online CV of min, please get it here [digital-cv](https://cv.ibnunowshad.com). My [calendar](https://cal.com/ibnunowshad) is open to block my time at your convinience, let's chat!
