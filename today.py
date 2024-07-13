@@ -46,7 +46,7 @@ def simple_request(func_name, query, variables):
         return request
     raise Exception(func_name, ' has failed with a', request.status_code, request.text, QUERY_COUNT)
 
-
+"""
 def graph_commits(start_date, end_date):
     """
     Uses GitHub's GraphQL v4 API to return my total commit count
@@ -310,7 +310,7 @@ def stars_counter(data):
     total_stars = 0
     for node in data: total_stars += node['node']['stargazers']['totalCount']
     return total_stars
-
+"""
 
 def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib_data, follower_data, loc_data):
     """
