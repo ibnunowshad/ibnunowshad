@@ -12,4 +12,5 @@ I don't need the mid-sized Jeep, AWS, GCP, or Linode just yet for my usage. But,
 
 Also, it's fun to learn something new, like split-horizon DNS, super-subnetting, or even just good old serial to times before password management was even a twinkle in someone's eye.
 
-So, if you're ready to ditch the status quo and build a cloud kingdom beyond the horizon, let's climb together. Drop me a line on [Keybase](https://keybase.com/ibnunowshad) or [Telegram](https://ibnunowshad.t.me), or email me at [github[at]ibn.slmail[dot]me](mailto:github@ibn.slmail.me). My [calendar](https://cal.com/ibnunowshad) is open to block my time at your convinience, let's chat!
+So, if you're ready to ditch the status quo and build a cloud kingdom beyond the horizon, let's climb together. Drop me a line on [Keybase](https://keybase.com/ibnunowshad) or [Telegram](https://ibnunowshad.t.me), or<br>
+email me at [github[at]ibn.slmail[dot]me](mailto:github@ibn.slmail.me)_(clicking on it will take you to your default email client or copy paste, ensure to replace **[at]** and **[dot]** with **@** and **.** respectively)_. My [calendar](https://cal.com/ibnunowshad) is open to block my time at your convinience, let's chat!
