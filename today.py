@@ -342,10 +342,11 @@ def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib
         tspans[uptime_index + 1].firstChild.data = age_data
     else:
         print("Uptime information not found or unable to update.")
+        
     f.write(svg.toxml('utf-8').decode('utf-8'))
     f.close()
 
-
+"""
 def commit_counter(comment_size):
     """
     Counts up my total commits, using the cache file created by cache_builder.
@@ -359,7 +360,7 @@ def commit_counter(comment_size):
     for line in data:
         total_commits += int(line.split()[2])
     return total_commits
-
+"""
 
 def svg_element_getter(filename):
     """
@@ -387,6 +388,7 @@ def user_getter(username):
     request = simple_request(user_getter.__name__, query, variables)
     return {'id': request.json()['data']['user']['id']}, request.json()['data']['user']['createdAt']
 
+"""
 def follower_getter(username):
     """
     Returns the number of followers of the user
@@ -402,7 +404,7 @@ def follower_getter(username):
     }'''
     request = simple_request(follower_getter.__name__, query, {'login': username})
     return int(request.json()['data']['user']['followers']['totalCount'])
-
+"""
 
 def query_count(funct_id):
     """
@@ -446,6 +448,7 @@ if __name__ == '__main__':
     # formatter('account data', user_time)
     age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 9))
     formatter('age calculation', age_time)
+    """
     total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
     formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
     commit_data, commit_time = perf_counter(commit_counter, 7)
@@ -480,3 +483,6 @@ if __name__ == '__main__':
 
     print('Total GitHub GraphQL API calls:', '{:>3}'.format(sum(QUERY_COUNT.values())))
     for funct_name, count in QUERY_COUNT.items(): print('{:<28}'.format('   ' + funct_name + ':'), '{:>6}'.format(count))
+    """
+    svg_overwrite('dark_mode.svg', age_data)
+    svg_overwrite('light_mode.svg', age_data)
