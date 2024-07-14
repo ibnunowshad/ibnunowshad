@@ -45,7 +45,7 @@ text, tspan {white-space: pre;}
 <text x="520" y="70" fill="#c9d1d9">
 <tspan x="520" y="70">m@rynfs</tspan>
 <tspan x="520" y="110" class="keyColor">OS</tspan>: <tspan class="valueColor">Linux, Mac, iOS</tspan>
-<tspan x="520" y="130" class="keyColor">Uptime</tspan>: <tspan class="valueColor">30 years, 4 months, 24 days</tspan>
+<tspan x="520" y="130" class="keyColor">Uptime</tspan>: <tspan class="valueColor">37 years, 2 months, 5 days</tspan>
 <tspan x="520" y="150" class="keyColor">Host</tspan>: <tspan class="valueColor">Deriv</tspan><tspan class="commentColor"/>
 <tspan x="520" y="170" class="keyColor">Kernel</tspan>: <tspan class="valueColor">Backend Developer</tspan><tspan class="commentColor"/>
 <tspan x="520" y="190" class="keyColor">IDE</tspan>: <tspan class="valueColor">VSCode</tspan>
