@@ -311,26 +311,22 @@ def stars_counter(data):
     return total_stars
 
 
-def svg_overwrite(filename, age_data):
+def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib_data, follower_data, loc_data):
     """
     Parse SVG files and update elements with my age, commits, stars, repositories, and lines written
     """
     svg = minidom.parse(filename)
     f = open(filename, mode='w', encoding='utf-8')
-    tspans = svg.getElementsByTagName('tspan')
-    uptime_index = None
-    for i, tspan in enumerate(tspans):
-        if tspan.firstChild and 'Uptime' in tspan.firstChild.data:
-            uptime_index = i
-            break
-
-    # Check if 'Uptime' tspan is found
-    if uptime_index is not None and uptime_index + 1 < len(tspans):
-        # Update the next tspan element after 'Uptime'
-        tspans[uptime_index + 1].firstChild.data = age_data
-    else:
-        print("Uptime information not found or unable to update.")
-        
+    tspan = svg.getElementsByTagName('tspan')
+    tspan[30].firstChild.data = age_data
+    tspan[65].firstChild.data = repo_data
+    tspan[67].firstChild.data = contrib_data
+    tspan[69].firstChild.data = commit_data
+    tspan[71].firstChild.data = star_data
+    tspan[73].firstChild.data = follower_data
+    tspan[75].firstChild.data = loc_data[2]
+    tspan[76].firstChild.data = loc_data[0] + '++'
+    tspan[77].firstChild.data = loc_data[1] + '--'
     f.write(svg.toxml('utf-8').decode('utf-8'))
     f.close()
 
