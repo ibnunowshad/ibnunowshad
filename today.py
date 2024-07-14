@@ -9,7 +9,7 @@ import hashlib
 # Personal access token with permissions: read:enterprise, read:org, read:repo_hook, read:user, repo
 HEADERS = {'authorization': 'token '+ os.environ['ACCESS_TOKEN']}
 USER_NAME = os.environ['USER_NAME'] # 'ibnunowshad'
-QUERY_COUNT = {'user_getter': 0} #'follower_getter': 0, 'graph_repos_stars': 0, 'recursive_loc': 0, 'graph_commits': 0, 'loc_query': 0}
+QUERY_COUNT = {'user_getter': 0, 'follower_getter': 0, 'graph_repos_stars': 0, 'recursive_loc': 0, 'graph_commits': 0, 'loc_query': 0}
 
 
 def daily_readme(birthday):
@@ -272,6 +272,7 @@ def flush_cache(edges, filename, comment_size):
         for node in edges:
             f.write(hashlib.sha256(node['node']['nameWithOwner'].encode('utf-8')).hexdigest() + ' 0 0 0 0\n')
 
+
 def add_archive():
     """
     Several repositories I have contributed to have since been deleted.
@@ -331,6 +332,21 @@ def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib
     f.close()
 
 
+def commit_counter(comment_size):
+    """
+    Counts up my total commits, using the cache file created by cache_builder.
+    """
+    total_commits = 0
+    filename = 'cache/'+hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()+'.txt' # Use the same filename as cache_builder
+    with open(filename, 'r') as f:
+        data = f.readlines()
+    cache_comment = data[:comment_size] # save the comment block
+    data = data[comment_size:] # remove those lines
+    for line in data:
+        total_commits += int(line.split()[2])
+    return total_commits
+
+
 def svg_element_getter(filename):
     """
     Prints the element index of every element in the SVG file
@@ -356,6 +372,22 @@ def user_getter(username):
     variables = {'login': username}
     request = simple_request(user_getter.__name__, query, variables)
     return {'id': request.json()['data']['user']['id']}, request.json()['data']['user']['createdAt']
+
+def follower_getter(username):
+    """
+    Returns the number of followers of the user
+    """
+    query_count('follower_getter')
+    query = '''
+    query($login: String!){
+        user(login: $login) {
+            followers {
+                totalCount
+            }
+        }
+    }'''
+    request = simple_request(follower_getter.__name__, query, {'login': username})
+    return int(request.json()['data']['user']['followers']['totalCount'])
 
 
 def query_count(funct_id):
@@ -390,16 +422,47 @@ def formatter(query_type, difference, funct_return=False, whitespace=0):
 
 if __name__ == '__main__':
     """
-    Ibrahim Nowshad (ibnunowshad), 2022-2023
+    Andrew Grant (ibnunowshad), 2022-2023
     """
     print('Calculation times:')
     # define global variable for owner ID and calculate user's creation date
     # e.g {'id': 'MDQ6VXNlcjU3MzMxMTM0'} and 2019-11-03T21:15:07Z for username 'ibnunowshad'
-    # user_data, user_time = perf_counter(user_getter, USER_NAME)
-    # OWNER_ID, acc_date = user_data
-    # formatter('account data', user_time)
+    user_data, user_time = perf_counter(user_getter, USER_NAME)
+    OWNER_ID, acc_date = user_data
+    formatter('account data', user_time)
     age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 9))
     formatter('age calculation', age_time)
-   
-    svg_overwrite('dark_mode.svg', age_data)
-    svg_overwrite('light_mode.svg', age_data)
+    total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
+    formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
+    commit_data, commit_time = perf_counter(commit_counter, 7)
+    star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
+    repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
+    contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
+    follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
+
+    # several repositories that I've contributed to have since been deleted.
+    if OWNER_ID == {'id': 'MDQ6VXNlcjU3MzMxMTM0'}: # only calculate for user ibnunowshad
+        archived_data = add_archive()
+        for index in range(len(total_loc)-1):
+            total_loc[index] += archived_data[index]
+        contrib_data += archived_data[-1]
+        commit_data += int(archived_data[-2])
+
+    commit_data = formatter('commit counter', commit_time, commit_data, 7)
+    star_data = formatter('star counter', star_time, star_data)
+    repo_data = formatter('my repositories', repo_time, repo_data, 2)
+    contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
+    follower_data = formatter('follower counter', follower_time, follower_data, 4)
+
+    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(total_loc[index]) # format added, deleted, and total LOC
+
+    svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+    svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+
+    # move cursor to override 'Calculation times:' with 'Total function time:' and the total function time, then move cursor back
+    print('\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F',
+        '{:<21}'.format('Total function time:'), '{:>11}'.format('%.4f' % (user_time + age_time + loc_time + commit_time + star_time + repo_time + contrib_time)),
+        ' s \033[E\033[E\033[E\033[E\033[E\033[E\033[E\033[E', sep='')
+
+    print('Total GitHub GraphQL API calls:', '{:>3}'.format(sum(QUERY_COUNT.values())))
+    for funct_name, count in QUERY_COUNT.items(): print('{:<28}'.format('   ' + funct_name + ':'), '{:>6}'.format(count))
