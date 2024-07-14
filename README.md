@@ -1,3 +1,10 @@
+<a href="https://github.com/ibnunowshad/ibnunowshad">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ibnunowshad/ibnunowshad/main/dark_mode.svg">
+    <img alt="Ibrahim Nowshad's GitHub Profile README" src="https://raw.githubusercontent.com/ibnunowshad/ibnunowshad/main/light_mode.svg">
+  </picture>
+</a>
+
 I started out building robust infrastructure, brick by brick. Then, the clouds rolled in, and I traded hammers for orchestration tools. Now, I'm not just an infrastructure pro, I'm a cloud whisperer, crafting secure, scalable solutions that dance in the sky.
 
 No two projects are identical, like no two mountain trails are the same. I've trekked through complex migrations, scaled peaks of automation, and rappelled down security cliffs. Every challenge is a chance to learn, and my backpack overflows with expertise in design, migration, and more.
