@@ -393,3 +393,7 @@ def save_and_exit(signum, frame):
     with open(filename, 'w') as f:
         f.write('data {} {}\n'.format(time.time(), 0))
     exit(1)
+
+
+# Set up signal to handle saving data and exiting safely
+signal.signal(signal.SIGINT, save_and_exit)
