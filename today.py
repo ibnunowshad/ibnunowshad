@@ -52,7 +52,7 @@ def graph_commits(start_date, end_date):
     Uses GitHub's GraphQL v4 API to return my total commit count
     """
     query_count('graph_commits')
-    query = query($start_date: DateTime!, $end_date: DateTime!, $login: String!) {
+    query = query ($start_date: DateTime!, $end_date: DateTime!, $login: String!) {
         user(login: $login) {
             contributionsCollection(from: $start_date, to: $end_date) {
                 contributionCalendar {
