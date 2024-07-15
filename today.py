@@ -5,11 +5,13 @@ import os
 from xml.dom import minidom
 import time
 import hashlib
+import signal
 
 # Personal access token with permissions: read:enterprise, read:org, read:repo_hook, read:user, repo
 HEADERS = {'Authorization': 'token ' + os.environ['ACCESS_TOKEN']}
 USER_NAME = os.environ['USER_NAME']
 QUERY_COUNT = {'user_getter': 0, 'follower_getter': 0, 'graph_repos_stars': 0, 'recursive_loc': 0, 'graph_commits': 0, 'loc_query': 0}
+# OWNER_ID = os.environ['OWNER_ID']
 
 
 def daily_readme(birthday):
@@ -100,6 +102,16 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del
         return request.json()['data']['user']['repositories']['totalCount']
     elif count_type == 'stars':
         return stars_counter(request.json()['data']['user']['repositories']['edges'])
+
+
+def stars_counter(data):
+    """
+    Count total stars in repositories owned by me
+    """
+    total_stars = 0
+    for node in data: 
+        total_stars += node['node']['stargazers']['totalCount']
+    return total_stars
 
 
 def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, deletion_total=0, my_commits=0, cursor=None):
@@ -251,21 +263,116 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
                     return int(line.split(' ')[2])
 
 
-def query_count(function_name):
+def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib_data, follower_data, loc_data):
     """
-    Keeps track of how many queries have been made to GitHub
+    Parse SVG files and update elements with my age, commits, stars, repositories, and lines written
     """
-    QUERY_COUNT[function_name] += 1
-    QUERY_COUNT['total'] += 1
+    svg = minidom.parse(filename)
+    f = open(filename, mode='w', encoding='utf-8')
+    tspan = svg.getElementsByTagName('tspan')
+    tspan[30].firstChild.data = age_data
+    tspan[65].firstChild.data = repo_data
+    tspan[67].firstChild.data = contrib_data
+    tspan[69].firstChild.data = commit_data
+    tspan[71].firstChild.data = star_data
+    tspan[73].firstChild.data = follower_data
+    tspan[75].firstChild.data = loc_data[2]
+    tspan[76].firstChild.data = loc_data[0] + '++'
+    tspan[77].firstChild.data = loc_data[1] + '--'
+    f.write(svg.toxml('utf-8').decode('utf-8'))
+    f.close()
 
 
-def stars_counter(edges, star_total=0):
+def commit_counter(comment_size):
     """
-    Count the number of stars in each repo
+    Counts up my total commits, using the cache file created by cache_builder.
     """
-    for repo in edges:
-        star_total += repo['node']['stargazers']['totalCount']
-    return star_total
+    total_commits = 0
+    filename = 'cache/' + hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest() + '.txt'  # Use the same filename as cache_builder
+    with open(filename, 'r') as f:
+        data = f.readlines()
+    cache_comment = data[:comment_size]  # save the comment block
+    data = data[comment_size:]  # remove those lines
+    for line in data:
+        total_commits += int(line.split()[2])
+    return total_commits
+
+
+def svg_element_getter(filename):
+    """
+    Prints the element index of every element in the SVG file
+    """
+    svg = minidom.parse(filename)
+    open(filename, mode='r', encoding='utf-8')
+    tspan = svg.getElementsByTagName('tspan')
+    for index in range(len(tspan)):
+        print(index, tspan[index].firstChild.data)
+
+
+def user_getter(username):
+    """
+    Returns the account ID and creation time of the user
+    """
+    query_count('user_getter')
+    query = """
+    query ($login: String!) {
+        user(login: $login) {
+            id
+            createdAt
+        }
+    }
+    """
+    variables = {'login': username}
+    request = simple_request(user_getter.__name__, query, variables)
+    return {'id': request.json()['data']['user']['id']}, request.json()['data']['user']['createdAt']
+
+
+def follower_getter(username):
+    """
+    Returns the number of followers of the user
+    """
+    query_count('follower_getter')
+    query = """
+    query ($login: String!) {
+        user(login: $login) {
+            followers {
+                totalCount
+            }
+        }
+    }
+    """
+    request = simple_request(follower_getter.__name__, query, {'login': username})
+    return int(request.json()['data']['user']['followers']['totalCount'])
+
+
+def query_count(funct_id):
+    """
+    Counts how many times the GitHub GraphQL API is called
+    """
+    global QUERY_COUNT
+    QUERY_COUNT[funct_id] += 1
+
+
+def perf_counter(funct, *args):
+    """
+    Calculates the time it takes for a function to run
+    Returns the function result and the time differential
+    """
+    start = time.perf_counter()
+    funct_return = funct(*args)
+    return funct_return, time.perf_counter() - start
+
+
+def formatter(query_type, difference, funct_return=False, whitespace=0):
+    """
+    Prints a formatted time differential
+    Returns formatted result if whitespace is specified, otherwise returns raw result
+    """
+    print('{:<23}'.format('   ' + query_type + ':'), sep='', end='')
+    print('{:>12}'.format('%.4f' % difference + ' s ')) if difference > 1 else print('{:>12}'.format('%.4f' % (difference * 1000) + ' ms'))
+    if whitespace:
+        return f"{'{:,}'.format(funct_return): <{whitespace}}"
+    return funct_return
 
 
 def force_close_file(data, cache_comment):
@@ -286,3 +393,58 @@ def save_and_exit(signum, frame):
     with open(filename, 'w') as f:
         f.write('data {} {}\n'.format(time.time(), 0))
     exit(1)
+
+
+# Set up signal to handle saving data and exiting safely
+signal.signal(signal.SIGINT, save_and_exit)
+
+
+# Example usage
+if __name__ == '__main__':
+    print('Calculation times:')
+    # define global variable for owner ID and calculate user's creation date
+    user_data, user_time = perf_counter(user_getter, USER_NAME)
+    OWNER_ID, acc_date = user_data
+    formatter('account data', user_time)
+    
+    age_data, age_time = perf_counter(daily_readme, datetime.datetime(1990, 7, 1))
+    formatter('age calculation', age_time)
+    
+    total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
+    formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
+    
+    commit_data, commit_time = perf_counter(commit_counter, 7)
+    star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
+    repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
+    contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
+    follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
+
+    # several repositories that I've contributed to have since been deleted.
+    if OWNER_ID == {'id': 'MDQ6VXNlcjUxMjE4NTI='}:  # only calculate for user ibnunowshad
+        archived_data = add_archive()
+        for index in range(len(total_loc) - 1):
+            total_loc[index] += archived_data[index]
+        contrib_data += archived_data[-1]
+        commit_data += int(archived_data[-2])
+
+    commit_data = formatter('commit counter', commit_time, commit_data, 7)
+    star_data = formatter('star counter', star_time, star_data)
+    repo_data = formatter('my repositories', repo_time, repo_data, 2)
+    contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
+    follower_data = formatter('follower counter', follower_time, follower_data, 4)
+
+    for index in range(len(total_loc) - 1):
+        total_loc[index] = '{:,}'.format(total_loc[index])  # format added, deleted, and total LOC
+
+    svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+    svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+
+    # move cursor to override 'Calculation times:' with 'Total function time:' and the total function time, then move cursor back
+    print('\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F',
+          '{:<21}'.format('Total function time:'),
+          '{:>11}'.format('%.4f' % (user_time + age_time + loc_time + commit_time + star_time + repo_time + contrib_time)),
+          ' s \033[E\033[E\033[E\033[E\033[E\033[E\033[E\033[E', sep='')
+
+    print('Total GitHub GraphQL API calls:', '{:>3}'.format(sum(QUERY_COUNT.values())))
+    for funct_name, count in QUERY_COUNT.items():
+        print('{:<28}'.format('   ' + funct_name + ':'), '{:>6}'.format(count))
