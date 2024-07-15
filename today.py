@@ -454,12 +454,6 @@ def add_archive():
     Function to handle querying and processing archived data.
     This implementation uses a mock API call for demonstration.
     """
-    # Example API endpoint (replace with actual endpoint and parameters)
-    url = "https://api.github.com/graphql"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",  # Replace with your GitHub token
-        "Content-Type": "application/json"
-    }
     query = """
     {
         user(login: "YOUR_USERNAME") {
