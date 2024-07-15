@@ -412,5 +412,5 @@ if __name__ == '__main__':
     age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 10))
     formatter('age calculation', age_time)
     
-    svg_overwrite('dark_mode.svg', age_data)
-    svg_overwrite('light_mode.svg', age_data)
+    svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+    svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
