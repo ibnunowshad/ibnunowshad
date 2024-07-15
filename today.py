@@ -447,66 +447,117 @@ def save_and_exit(signum, frame):
     exit(1)
 
 
+import requests
+
 def add_archive():
     """
-    Function to handle the archiving of data.
-    This is a placeholder and should be implemented according to specific requirements.
+    Function to handle querying and processing archived data.
+    This implementation uses a mock API call for demonstration.
     """
-    # Implement the logic for adding archive data here
-    # This might include fetching archived data, processing it, and returning the required information.
-    archived_data = {
-        "info": "Archive data processing not yet implemented"
+    # Example API endpoint (replace with actual endpoint and parameters)
+    url = "https://api.github.com/graphql"
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",  # Replace with your GitHub token
+        "Content-Type": "application/json"
     }
+    query = """
+    {
+        user(login: "YOUR_USERNAME") {
+            repositories(first: 100, isArchived: true) {
+                edges {
+                    node {
+                        nameWithOwner
+                        defaultBranchRef {
+                            target {
+                                history {
+                                    totalCount
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    """
+
+    response = requests.post(url, json={'query': query}, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Query failed to run with a {response.status_code}: {response.text}")
+
+    data = response.json()
+    archived_data = {}
+    for edge in data['data']['user']['repositories']['edges']:
+        repo_hash = hashlib.sha256(edge['node']['nameWithOwner'].encode('utf-8')).hexdigest()
+        total_count = edge['node']['defaultBranchRef']['target']['history']['totalCount']
+        archived_data[repo_hash] = total_count
+
     return archived_data
+
 
 
 # Set up signal to handle saving data and exiting safely
 signal.signal(signal.SIGINT, save_and_exit)
 
 
-if __name__ == '__main__':
+def main():
     """
-    Ibrahim Nowshad (ibnunowshad), 2013-2023
+    Main function to execute the script.
     """
-    print('Calculation times:')
-    # define global variable for owner ID and calculate user's creation date
-    # e.g {'id': 'MDQ6VXNlcjUxMjE4NTI='} and 2019-11-03T21:15:07Z for username 'ibnunowshad'
-    user_data, user_time = perf_counter(user_getter, USER_NAME)
-    OWNER_ID, acc_date = user_data
-    formatter('account data', user_time)
-    age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 9))
-    formatter('age calculation', age_time)
-    total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
-    formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
-    commit_data, commit_time = perf_counter(commit_counter, 7)
-    star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
-    repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
-    contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
-    follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
+    if __name__ == '__main__':
+        print('Calculation times:')
 
-    # several repositories that I've contributed to have since been deleted.
-    if OWNER_ID == {'id': 'MDQ6VXNlcjUxMjE4NTI='}: # only calculate for user ibnunowshad
-        archived_data = add_archive()
-        for index in range(len(total_loc)-1):
-            total_loc[index] += archived_data[index]
-        contrib_data += archived_data[-1]
-        commit_data += int(archived_data[-2])
+        # Perform initial calculations
+        user_data, user_time = perf_counter(user_getter, USER_NAME)
+        OWNER_ID, acc_date = user_data
+        formatter('account data', user_time)
 
-    commit_data = formatter('commit counter', commit_time, commit_data, 7)
-    star_data = formatter('star counter', star_time, star_data)
-    repo_data = formatter('my repositories', repo_time, repo_data, 2)
-    contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
-    follower_data = formatter('follower counter', follower_time, follower_data, 4)
+        age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 9))
+        formatter('age calculation', age_time)
 
-    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(total_loc[index]) # format added, deleted, and total LOC
+        total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
+        formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
 
-    svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
-    svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
+        commit_data, commit_time = perf_counter(commit_counter, 7)
+        star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
+        repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
+        contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
+        follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
 
-    # move cursor to override 'Calculation times:' with 'Total function time:' and the total function time, then move cursor back
-    print('\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F',
-        '{:<21}'.format('Total function time:'), '{:>11}'.format('%.4f' % (user_time + age_time + loc_time + commit_time + star_time + repo_time + contrib_time)),
-        ' s \033[E\033[E\033[E\033[E\033[E\033[E\033[E\033[E', sep='')
+        # Handle archived data for the specific user
+        if OWNER_ID == {'id': 'MDQ6VXNlcjUxMjE4NTI='}:  # Only calculate for user ibnunowshad
+            archived_data = add_archive()
+            if archived_data:
+                total_loc[0] += archived_data['LOC']
+                contrib_data += archived_data['contributed_repos']
+                commit_data += archived_data['commits']
 
-    print('Total GitHub GraphQL API calls:', '{:>3}'.format(sum(QUERY_COUNT.values())))
-    for funct_name, count in QUERY_COUNT.items(): print('{:<28}'.format('   ' + funct_name + ':'), '{:>6}'.format(count))
+        commit_data = formatter('commit counter', commit_time, commit_data, 7)
+        star_data = formatter('star counter', star_time, star_data)
+        repo_data = formatter('my repositories', repo_time, repo_data, 2)
+        contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
+        follower_data = formatter('follower counter', follower_time, follower_data, 4)
+
+        for index in range(len(total_loc) - 1):
+            total_loc[index] = '{:,}'.format(total_loc[index])  # Format added, deleted, and total LOC
+
+        svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data,
+                      total_loc[:-1])
+        svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data,
+                      total_loc[:-1])
+
+        # Print total function time
+        total_function_time = user_time + age_time + loc_time + commit_time + star_time + repo_time + contrib_time
+        print(f"Total function time: {'%.4f' % total_function_time} s")
+
+        # Print total GitHub GraphQL API calls
+        total_api_calls = sum(QUERY_COUNT.values())
+        print(f"Total GitHub GraphQL API calls: {total_api_calls}")
+
+        # Print individual API call counts
+        for funct_name, count in QUERY_COUNT.items():
+            print(f"{funct_name}: {count}")
+
+# Call main function when running the script
+if __name__ == "__main__":
+    main()
