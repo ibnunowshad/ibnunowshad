@@ -228,39 +228,62 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     Checks each repository in edges to see if it has been updated since the last time it was cached
     If it has, run recursive_loc on that repository to update the LOC count
     """
-    cached = True  # Assume all repositories are cached
-    filename = 'cache/' + hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest() + '.txt'  # Create a unique filename for each user
+    cached = True # Assume all repositories are cached
+    filename = 'cache/'+hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()+'.txt' # Create a unique filename for each user
     try:
         with open(filename, 'r') as f:
-            for line in f:
-                if line.split(' ')[0] == 'data':
-                    data = int(line.split(' ')[1])
-                    cache_comment = int(line.split(' ')[2])
-                    if (comment_size > 0 and cache_comment != comment_size) or force_cache:  # If the cache is invalid
-                        os.remove(filename)
-                        cached = False
-                        break
-    except FileNotFoundError:
-        cached = False
-    if not cached:  # If any repository is not cached
+            data = f.readlines()
+    except FileNotFoundError: # If the cache file doesn't exist, create it
+        data = []
+        if comment_size > 0:
+            for _ in range(comment_size): data.append('This line is a comment block. Write whatever you want here.\n')
         with open(filename, 'w') as f:
-            for i in edges:
-                if i['node']['defaultBranchRef'] is not None:
-                    data = int(time.mktime(time.strptime(i['node']['defaultBranchRef']['target']['history']['edges'][0]['node']['committedDate'], '%Y-%m-%dT%H:%M:%SZ')))
-                    cache_comment = comment_size
-                    f.write('data {} {}\n'.format(data, cache_comment))
-                    addition_total, deletion_total, my_commits = recursive_loc(USER_NAME, i['node']['nameWithOwner'].split('/')[1], data, cache_comment)
-                    loc_add += addition_total
-                    loc_del += deletion_total
-        with open(filename, 'w') as f:  # Save the file in case the program crashes again
-            f.write('data {} {}\n'.format(data, cache_comment))
-            f.write('comment_size {} {}\n'.format(comment_size, loc_add - loc_del))
-            return loc_add - loc_del
-    else:
+            f.writelines(data)
+
+    if len(data)-comment_size != len(edges) or force_cache: # If the number of repos has changed, or force_cache is True
+        cached = False
+        flush_cache(edges, filename, comment_size)
         with open(filename, 'r') as f:
-            for line in f:
-                if line.split(' ')[0] == 'comment_size':
-                    return int(line.split(' ')[2])
+            data = f.readlines()
+
+    cache_comment = data[:comment_size] # save the comment block
+    data = data[comment_size:] # remove those lines
+    for index in range(len(edges)):
+        repo_hash, commit_count, *__ = data[index].split()
+        if repo_hash == hashlib.sha256(edges[index]['node']['nameWithOwner'].encode('utf-8')).hexdigest():
+            try:
+                default_branch_ref = edges[index]['node'].get('defaultBranchRef')
+                if not default_branch_ref:
+                    continue
+
+                target = default_branch_ref.get('target')
+                if not target:
+                    continue
+
+                history = target.get('history')
+                if not history:
+                    continue
+
+                total_count = history.get('totalCount')
+                if total_count is None:
+                    continue
+
+                if int(commit_count) != total_count:
+                    # if commit count has changed, update loc for that repo
+                    owner, repo_name = edges[index]['node']['nameWithOwner'].split('/')
+                    loc = recursive_loc(owner, repo_name, data, cache_comment)
+                    data[index] = repo_hash + ' ' + str(total_count) + ' ' + str(loc[2]) + ' ' + str(loc[0]) + ' ' + str(loc[1]) + '\n'
+            except TypeError: # If the repo is empty
+                data[index] = repo_hash + ' 0 0 0 0\n'
+    with open(filename, 'w') as f:
+        f.writelines(cache_comment)
+        f.writelines(data)
+    for line in data:
+        loc = line.split()
+        loc_add += int(loc[3])
+        loc_del += int(loc[4])
+    return [loc_add, loc_del, loc_add - loc_del, cached]
+
 
 
 def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib_data, follower_data, loc_data):
