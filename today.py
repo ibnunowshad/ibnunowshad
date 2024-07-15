@@ -398,6 +398,7 @@ def save_and_exit(signum, frame):
 # Set up signal to handle saving data and exiting safely
 signal.signal(signal.SIGINT, save_and_exit)
 
+
 # Example usage
 if __name__ == '__main__':
     """
@@ -405,26 +406,31 @@ if __name__ == '__main__':
     """
     print('Calculation times:')
     # define global variable for owner ID and calculate user's creation date
-    # e.g {'id': 'MDQ6VXNlcjUxMjE4NTI='} and 2019-11-03T21:15:07Z for username 'Andrew6rant'
-    # user_data, user_time = perf_counter(user_getter, USER_NAME)
-    # OWNER_ID, acc_date = user_data
-    # formatter('account data', user_time)
-    age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 10))
-    formatter('age calculation', age_time)
-
-    # several repositories that I've contributed to have since been deleted.
-    if OWNER_ID == {'id': 'MDQ6VXNlcjU3MzMxMTM0'}: # only calculate for user Andrew6rant
-        archived_data = add_archive()
-        for index in range(len(total_loc)-1):
-            total_loc[index] += archived_data[index]
-        contrib_data += archived_data[-1]
-        commit_data += int(archived_data[-2])
-
-    commit_data = formatter('commit counter', commit_time, commit_data, 7)
-    star_data = formatter('star counter', star_time, star_data)
-    repo_data = formatter('my repositories', repo_time, repo_data, 2)
-    contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
-    follower_data = formatter('follower counter', follower_time, follower_data, 4)
+    user_data, user_time = perf_counter(user_getter, USER_NAME)
+    OWNER_ID, acc_date = user_data
+    formatter('account data', user_time)
     
+    age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 9))
+    formatter('age calculation', age_time)
+    
+    total_loc, loc_time = perf_counter(loc_query, ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'], 7)
+    formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
+    
+    commit_data, commit_time = perf_counter(commit_counter, 7)
+    formatter('commit counter', commit_time, commit_data, 7)
+    
+    star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
+    formatter('star counter', star_time, star_data)
+    
+    repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
+    formatter('my repositories', repo_time, repo_data, 2)
+    
+    contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
+    formatter('contributed repos', contrib_time, contrib_data, 2)
+    
+    follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
+    formatter('follower counter', follower_time, follower_data, 4)
+
+
     svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
     svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
