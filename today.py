@@ -236,8 +236,21 @@ def flush_cache(edges, filename, comment_size):
 
         for edge in edges:
             repo_hash = hashlib.sha256(edge['node']['nameWithOwner'].encode('utf-8')).hexdigest()
-            commit_count = edge['node']['defaultBranchRef']['target']['history']['totalCount']
+            default_branch_ref = edge['node'].get('defaultBranchRef')
+            if not default_branch_ref:
+                commit_count = 0
+            else:
+                target = default_branch_ref.get('target')
+                if not target:
+                    commit_count = 0
+                else:
+                    history = target.get('history')
+                    if not history:
+                        commit_count = 0
+                    else:
+                        commit_count = history.get('totalCount', 0)
             f.write(f"{repo_hash} {commit_count} 0 0 0\n")  # Initialize LOC values as 0
+
 
 # Add the flush_cache function to the script where it was called before
 def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
