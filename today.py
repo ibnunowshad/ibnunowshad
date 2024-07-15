@@ -223,6 +223,23 @@ def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None,
         return cache_builder(edges + request.json()['data']['user']['repositories']['edges'], comment_size, force_cache)
 
 
+def flush_cache(edges, filename, comment_size):
+    """
+    Write initial data to the cache file.
+    Each line in the cache file represents a repository and its commit count.
+    """
+    with open(filename, 'w') as f:
+        # Add the comment block to the cache file
+        if comment_size > 0:
+            for _ in range(comment_size):
+                f.write('This line is a comment block. Write whatever you want here.\n')
+
+        for edge in edges:
+            repo_hash = hashlib.sha256(edge['node']['nameWithOwner'].encode('utf-8')).hexdigest()
+            commit_count = edge['node']['defaultBranchRef']['target']['history']['totalCount']
+            f.write(f"{repo_hash} {commit_count} 0 0 0\n")  # Initialize LOC values as 0
+
+# Add the flush_cache function to the script where it was called before
 def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     """
     Checks each repository in edges to see if it has been updated since the last time it was cached
@@ -283,7 +300,6 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
         loc_add += int(loc[3])
         loc_del += int(loc[4])
     return [loc_add, loc_del, loc_add - loc_del, cached]
-
 
 
 def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib_data, follower_data, loc_data):
