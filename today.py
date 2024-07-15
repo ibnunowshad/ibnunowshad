@@ -362,13 +362,13 @@ def user_getter(username):
     Returns the account ID and creation time of the user
     """
     query_count('user_getter')
-    query = '''
+    query = 
     query($login: String!){
         user(login: $login) {
             id
             createdAt
         }
-    }'''
+    }
     variables = {'login': username}
     request = simple_request(user_getter.__name__, query, variables)
     return {'id': request.json()['data']['user']['id']}, request.json()['data']['user']['createdAt']
@@ -378,14 +378,14 @@ def follower_getter(username):
     Returns the number of followers of the user
     """
     query_count('follower_getter')
-    query = '''
+    query =
     query($login: String!){
         user(login: $login) {
             followers {
                 totalCount
             }
         }
-    }'''
+    }
     request = simple_request(follower_getter.__name__, query, {'login': username})
     return int(request.json()['data']['user']['followers']['totalCount'])
 
