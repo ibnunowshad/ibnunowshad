@@ -411,6 +411,20 @@ if __name__ == '__main__':
     # formatter('account data', user_time)
     age_data, age_time = perf_counter(daily_readme, datetime.datetime(1987, 5, 10))
     formatter('age calculation', age_time)
+
+    # several repositories that I've contributed to have since been deleted.
+    if OWNER_ID == {'id': 'MDQ6VXNlcjU3MzMxMTM0'}: # only calculate for user Andrew6rant
+        archived_data = add_archive()
+        for index in range(len(total_loc)-1):
+            total_loc[index] += archived_data[index]
+        contrib_data += archived_data[-1]
+        commit_data += int(archived_data[-2])
+
+    commit_data = formatter('commit counter', commit_time, commit_data, 7)
+    star_data = formatter('star counter', star_time, star_data)
+    repo_data = formatter('my repositories', repo_time, repo_data, 2)
+    contrib_data = formatter('contributed repos', contrib_time, contrib_data, 2)
+    follower_data = formatter('follower counter', follower_time, follower_data, 4)
     
     svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
     svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
