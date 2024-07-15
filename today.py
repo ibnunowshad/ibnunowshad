@@ -52,8 +52,7 @@ def graph_commits(start_date, end_date):
     Uses GitHub's GraphQL v4 API to return my total commit count
     """
     query_count('graph_commits')
-    query =
-    query($start_date: DateTime!, $end_date: DateTime!, $login: String!) {
+    query = query($start_date: DateTime!, $end_date: DateTime!, $login: String!) {
         user(login: $login) {
             contributionsCollection(from: $start_date, to: $end_date) {
                 contributionCalendar {
@@ -72,8 +71,7 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del
     Uses GitHub's GraphQL v4 API to return my total repository, star, or lines of code count.
     """
     query_count('graph_repos_stars')
-    query = 
-    query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
+    query = query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
         user(login: $login) {
             repositories(first: 100, after: $cursor, ownerAffiliations: $owner_affiliation) {
                 totalCount
@@ -108,8 +106,7 @@ def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, delet
     Uses GitHub's GraphQL v4 API and cursor pagination to fetch 100 commits from a repository at a time
     """
     query_count('recursive_loc')
-    query = 
-    query ($repo_name: String!, $owner: String!, $cursor: String) {
+    query = query ($repo_name: String!, $owner: String!, $cursor: String) {
         repository(name: $repo_name, owner: $owner) {
             defaultBranchRef {
                 target {
@@ -176,8 +173,7 @@ def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None,
     Returns the total number of lines of code in all repositories
     """
     query_count('loc_query')
-    query =
-    query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
+    query = query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
         user(login: $login) {
             repositories(first: 60, after: $cursor, ownerAffiliations: $owner_affiliation) {
             edges {
@@ -362,8 +358,7 @@ def user_getter(username):
     Returns the account ID and creation time of the user
     """
     query_count('user_getter')
-    query = 
-    query($login: String!){
+    query = query($login: String!){
         user(login: $login) {
             id
             createdAt
@@ -378,8 +373,7 @@ def follower_getter(username):
     Returns the number of followers of the user
     """
     query_count('follower_getter')
-    query =
-    query($login: String!){
+    query = query($login: String!){
         user(login: $login) {
             followers {
                 totalCount
