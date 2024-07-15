@@ -52,7 +52,7 @@ def graph_commits(start_date, end_date):
     Uses GitHub's GraphQL v4 API to return my total commit count
     """
     query_count('graph_commits')
-    query = '''
+    query =
     query($start_date: DateTime!, $end_date: DateTime!, $login: String!) {
         user(login: $login) {
             contributionsCollection(from: $start_date, to: $end_date) {
@@ -61,7 +61,7 @@ def graph_commits(start_date, end_date):
                 }
             }
         }
-    }'''
+    }
     variables = {'start_date': start_date,'end_date': end_date, 'login': USER_NAME}
     request = simple_request(graph_commits.__name__, query, variables)
     return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
@@ -72,7 +72,7 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del
     Uses GitHub's GraphQL v4 API to return my total repository, star, or lines of code count.
     """
     query_count('graph_repos_stars')
-    query = '''
+    query = 
     query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
         user(login: $login) {
             repositories(first: 100, after: $cursor, ownerAffiliations: $owner_affiliation) {
@@ -93,7 +93,7 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del
                 }
             }
         }
-    }'''
+    }
     variables = {'owner_affiliation': owner_affiliation, 'login': USER_NAME, 'cursor': cursor}
     request = simple_request(graph_repos_stars.__name__, query, variables)
     if request.status_code == 200:
@@ -108,7 +108,7 @@ def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, delet
     Uses GitHub's GraphQL v4 API and cursor pagination to fetch 100 commits from a repository at a time
     """
     query_count('recursive_loc')
-    query = '''
+    query = 
     query ($repo_name: String!, $owner: String!, $cursor: String) {
         repository(name: $repo_name, owner: $owner) {
             defaultBranchRef {
@@ -139,7 +139,7 @@ def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, delet
                 }
             }
         }
-    }'''
+    }
     variables = {'repo_name': repo_name, 'owner': owner, 'cursor': cursor}
     request = requests.post('https://api.github.com/graphql', json={'query': query, 'variables':variables}, headers=HEADERS) # I cannot use simple_request(), because I want to save the file before raising Exception
     if request.status_code == 200:
@@ -176,7 +176,7 @@ def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None,
     Returns the total number of lines of code in all repositories
     """
     query_count('loc_query')
-    query = '''
+    query =
     query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
         user(login: $login) {
             repositories(first: 60, after: $cursor, ownerAffiliations: $owner_affiliation) {
@@ -202,7 +202,7 @@ def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None,
                 }
             }
         }
-    }'''
+    }
     variables = {'owner_affiliation': owner_affiliation, 'login': USER_NAME, 'cursor': cursor}
     request = simple_request(loc_query.__name__, query, variables)
     if request.json()['data']['user']['repositories']['pageInfo']['hasNextPage']:   # If repository data has another page
