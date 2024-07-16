@@ -9,6 +9,13 @@ I hold bachelor’s in information technology with project in security measures 
 
 My career path has been an adventure. I began by building solid infrastructure, one piece at a time. Then, the cloud revolution hit, and I swapped hammers for orchestration tools. Now, I'm more than just an infrastructure expert – I'm a cloud whisperer, crafting secure and scalable solutions that exist up in the cloud.
 
+```
+Moving to the cloud requires a mindset chnage
+
+| On-premises | Cloud |
+
+```
+
 Every project is unique, just like no two hikes are the same. I've tackled complex migrations, scaled the heights of automation, and navigated the challenges of cloud security. Each obstacle has been a learning experience, and my backpack is overflowing with expertise in design, migration, and more.
 
 But my life isn't all work and no play! When I'm not working on servers, I like to explore new places and cultures. These adventures keep me curious and bring fresh perspectives to every project, just like having sharp trekking poles helps on a hike!
