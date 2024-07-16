@@ -5,7 +5,7 @@
   </picture>
 </a>
 
-I hold bachelor’s in information technology with project in security measures based on IEEE 2009 paper for SMS based 2FA. I have 10+ years of working experience in [Café Coffee Day](https://www.cafecoffeeday.com/), [Myntra](https://www.myntra.com/) _([Flipkart](https://www.flipkart.com/))_, [Dailyhunt](https://dailyhunt.in) _([Verse](https://verse.in/))_, [Lazada](https://lazada.com/) _([Alibaba Group](https://www.alibaba.com/))_, [Culfit](https://www.cult.fit/) as an architect, engineer, TPM in the past years. I setup processes, framework, and policies based on industry best practices to achieve desired outcome and yielded successful outcomes as byproduct.
+I hold bachelor’s in information technology with project in security measures based on IEEE 2009 paper for SMS based 2FA. I have 10+ years of working experience in [Café Coffee Day](https://www.cafecoffeeday.com/), [Myntra](https://www.myntra.com/) _[(Flipkart)](https://www.flipkart.com/)_, [Dailyhunt](https://dailyhunt.in) _[(Verse)](https://verse.in/)_, [Lazada](https://lazada.com/) _[(Alibaba Group)](https://www.alibaba.com/)_, [Culfit](https://www.cult.fit/) as an architect, engineer, TPM in the past years. I setup processes, framework, and policies based on industry best practices to achieve desired outcome and yielded successful outcomes as byproduct.
 
 My career path has been an adventure. I began by building solid infrastructure, one piece at a time. Then, the cloud revolution hit, and I swapped hammers for orchestration tools. Now, I'm more than just an infrastructure expert – I'm a cloud whisperer, crafting secure and scalable solutions that exist up in the cloud.
 
