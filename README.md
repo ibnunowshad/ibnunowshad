@@ -12,10 +12,12 @@ My career path has been an adventure. I began by building solid infrastructure, 
 
 **Moving to the cloud requires a mindset change**
 ```
-| On-premises               | Cloud                                  |
-| -------------             | -------------                          |
-| Buy machines              | Rent machines                          |
-| Run machines for years    | Turn machines off as soon as possible  |
+| On-premises                         | Cloud                                  |
+| -------------                       | -------------                          |
+| Buy machines                        | Rent machines                          |
+| Run machines for years              | Turn machines off as soon as possible  |
+| Prefer fewer big machines           | Prefer lots of small machines          |
+| Machines are capital expenditures   | Machines are monthly expenses          |
 ```
 
 
