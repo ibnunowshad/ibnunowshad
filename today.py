@@ -91,7 +91,11 @@ def ensure_cache_directory():
         os.makedirs('cache')
 
 def daily_readme(birthday: str) -> str:
-    """Returns the length of time since birth date."""
+    """
+    Returns the length of time since birth date.
+    Args:
+        birthday: ISO format date string (YYYY-MM-DD)
+    """
     if not validate_date(birthday):
         raise ValueError("Birthday must be in ISO format (YYYY-MM-DD)")
     
