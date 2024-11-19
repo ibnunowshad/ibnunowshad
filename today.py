@@ -26,9 +26,21 @@ def validate_date(date_str: str) -> bool:
 def validate_github_token(token: str) -> bool:
     """Validates if a GitHub token has the correct format."""
     if not token or not isinstance(token, str):
+        print("Token validation failed: Token is empty or not a string")
         return False
-    # GitHub tokens are 40 chars long and contain only hexadecimal chars
-    return len(token) == 40 and all(c in '0123456789abcdefABCDEF' for c in token)
+
+    # More permissive validation for different token formats
+    # Accepts both classic and fine-grained tokens
+    is_valid = (
+        isinstance(token, str) and
+        len(token) >= 4 and  # Minimum reasonable length
+        all(c.isalnum() or c in '_-' for c in token)
+    )
+    
+    if not is_valid:
+        print(f"Token validation failed: Length={len(token)}")
+    
+    return is_valid
 
 def validate_github_username(username: str) -> bool:
     """Validates if a GitHub username follows GitHub's username rules."""
@@ -49,6 +61,12 @@ def validate_environment() -> None:
         'ACCESS_TOKEN': validate_github_token,
         'USER_NAME': validate_github_username
     }
+    
+    # Debug logging
+    for var in required_vars:
+        value = os.environ.get(var)
+        masked_value = '***' if value else 'None'
+        print(f"Checking {var}: Present={bool(value)}, Length={len(value) if value else 0}")
     
     missing = []
     invalid = []
