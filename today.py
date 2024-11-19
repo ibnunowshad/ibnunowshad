@@ -7,6 +7,7 @@ import time
 import hashlib
 import signal
 from typing import Dict, List, Optional, Tuple, Union
+import sys
 
 # Personal access token with permissions: read:enterprise, read:org, read:repo_hook, read:user, repo
 HEADERS = {'Authorization': 'token ' + os.environ['ACCESS_TOKEN']}
