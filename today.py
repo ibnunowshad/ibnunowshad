@@ -96,7 +96,7 @@ def daily_readme(birthday: str) -> str:
         raise ValueError("Birthday must be in ISO format (YYYY-MM-DD)")
     
     try:
-        birth_date = datetime.fromisoformat(birthday.replace('Z', '+00:00'))
+        birth_date = datetime.fromisoformat(birthday)
         diff = relativedelta.relativedelta(datetime.today(), birth_date)
         return '{} {}, {} {}, {} {}{}'.format(
             diff.years, 'year' + format_plural(diff.years),
@@ -473,8 +473,9 @@ if __name__ == "__main__":
     OWNER_ID, acc_date = user_data
     formatter('account data', user_time)
     
-    # Calculate age
-    age_data, age_time = perf_counter(daily_readme, datetime.datetime(2002, 7, 5))
+    # Calculate age - Fix the date format (YYYY-MM-DD)
+    birthday = "1987-05-09"  #ISO format
+    age_data, age_time = perf_counter(daily_readme, birthday)
     formatter('age calculation', age_time)
     
     # Get repository stats
